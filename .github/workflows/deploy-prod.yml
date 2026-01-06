@@ -1,0 +1,54 @@
+# ABOUTME: Deployment workflow for the production environment.
+# ABOUTME: Triggered on push to main branch after CI passes.
+
+name: Deploy to Production
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20.x'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run tests before deploy
+        env:
+          TWILIO_ACCOUNT_SID: ${{ secrets.TWILIO_ACCOUNT_SID }}
+          TWILIO_AUTH_TOKEN: ${{ secrets.TWILIO_AUTH_TOKEN }}
+          TWILIO_PHONE_NUMBER: ${{ secrets.TWILIO_PHONE_NUMBER }}
+          TWILIO_VERIFY_SERVICE_SID: ${{ secrets.TWILIO_VERIFY_SERVICE_SID }}
+        run: npm test
+
+      - name: Install Twilio CLI
+        run: npm install -g twilio-cli
+
+      - name: Install Serverless Plugin
+        run: twilio plugins:install @twilio-labs/plugin-serverless
+
+      - name: Deploy to production environment
+        env:
+          TWILIO_ACCOUNT_SID: ${{ secrets.TWILIO_ACCOUNT_SID }}
+          TWILIO_API_KEY: ${{ secrets.TWILIO_API_KEY }}
+          TWILIO_API_SECRET: ${{ secrets.TWILIO_API_SECRET }}
+        run: |
+          twilio serverless:deploy \
+            --environment production \
+            --account-sid $TWILIO_ACCOUNT_SID \
+            --api-key $TWILIO_API_KEY \
+            --api-secret $TWILIO_API_SECRET
+
+      - name: Output deployment info
+        run: echo "Deployed to production environment successfully"

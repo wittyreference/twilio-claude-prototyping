@@ -1,0 +1,7 @@
+{
+  "serviceName": "prototype",
+  "functionsFolder": "functions",
+  "assetsFolder": "assets",
+  "env": ".env",
+  "pkgJson": true
+}

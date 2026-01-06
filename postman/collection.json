@@ -1,0 +1,273 @@
+{
+  "info": {
+    "name": "Twilio Prototype API Tests",
+    "description": "End-to-end API tests for Twilio serverless functions",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Voice",
+      "item": [
+        {
+          "name": "Incoming Call Handler",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/x-www-form-urlencoded"
+              }
+            ],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                {
+                  "key": "CallSid",
+                  "value": "CA1234567890abcdef1234567890abcdef"
+                },
+                {
+                  "key": "From",
+                  "value": "+15551234567"
+                },
+                {
+                  "key": "To",
+                  "value": "{{TWILIO_PHONE_NUMBER}}"
+                },
+                {
+                  "key": "CallStatus",
+                  "value": "ringing"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{BASE_URL}}/voice/incoming-call",
+              "host": ["{{BASE_URL}}"],
+              "path": ["voice", "incoming-call"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response is TwiML', function () {",
+                  "    pm.expect(pm.response.text()).to.include('<?xml');",
+                  "    pm.expect(pm.response.text()).to.include('<Response>');",
+                  "});",
+                  "",
+                  "pm.test('Contains Say verb', function () {",
+                  "    pm.expect(pm.response.text()).to.include('<Say');",
+                  "});",
+                  "",
+                  "pm.test('Contains Gather verb', function () {",
+                  "    pm.expect(pm.response.text()).to.include('<Gather');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Messaging",
+      "item": [
+        {
+          "name": "Incoming SMS Handler",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/x-www-form-urlencoded"
+              }
+            ],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                {
+                  "key": "MessageSid",
+                  "value": "SM1234567890abcdef1234567890abcdef"
+                },
+                {
+                  "key": "From",
+                  "value": "+15551234567"
+                },
+                {
+                  "key": "To",
+                  "value": "{{TWILIO_PHONE_NUMBER}}"
+                },
+                {
+                  "key": "Body",
+                  "value": "Hello from E2E test"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{BASE_URL}}/messaging/incoming-sms",
+              "host": ["{{BASE_URL}}"],
+              "path": ["messaging", "incoming-sms"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response is TwiML', function () {",
+                  "    pm.expect(pm.response.text()).to.include('<?xml');",
+                  "    pm.expect(pm.response.text()).to.include('<Response>');",
+                  "});",
+                  "",
+                  "pm.test('Contains Message element', function () {",
+                  "    pm.expect(pm.response.text()).to.include('<Message>');",
+                  "});",
+                  "",
+                  "pm.test('Echoes incoming message', function () {",
+                  "    pm.expect(pm.response.text()).to.include('Hello from E2E test');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Conversation Relay",
+      "item": [
+        {
+          "name": "Relay Handler",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/x-www-form-urlencoded"
+              }
+            ],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                {
+                  "key": "CallSid",
+                  "value": "CA1234567890abcdef1234567890abcdef"
+                },
+                {
+                  "key": "From",
+                  "value": "+15551234567"
+                },
+                {
+                  "key": "To",
+                  "value": "{{TWILIO_PHONE_NUMBER}}"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{BASE_URL}}/conversation-relay/relay-handler",
+              "host": ["{{BASE_URL}}"],
+              "path": ["conversation-relay", "relay-handler"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response is TwiML', function () {",
+                  "    pm.expect(pm.response.text()).to.include('<?xml');",
+                  "    pm.expect(pm.response.text()).to.include('<Response>');",
+                  "});",
+                  "",
+                  "pm.test('Contains Connect element', function () {",
+                  "    pm.expect(pm.response.text()).to.include('<Connect>');",
+                  "});",
+                  "",
+                  "pm.test('Contains ConversationRelay element', function () {",
+                  "    pm.expect(pm.response.text()).to.include('<ConversationRelay');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Health Check",
+      "item": [
+        {
+          "name": "Voice Endpoint Available",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{BASE_URL}}/voice/incoming-call",
+              "host": ["{{BASE_URL}}"],
+              "path": ["voice", "incoming-call"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Endpoint is accessible', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Messaging Endpoint Available",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{BASE_URL}}/messaging/incoming-sms",
+              "host": ["{{BASE_URL}}"],
+              "path": ["messaging", "incoming-sms"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Endpoint is accessible', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "BASE_URL",
+      "value": "http://localhost:3000"
+    }
+  ]
+}

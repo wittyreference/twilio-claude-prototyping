@@ -1,0 +1,25 @@
+{
+  "id": "twilio-prototype-env",
+  "name": "Twilio Prototype - Local",
+  "values": [
+    {
+      "key": "BASE_URL",
+      "value": "http://localhost:3000",
+      "enabled": true,
+      "type": "default"
+    },
+    {
+      "key": "TWILIO_PHONE_NUMBER",
+      "value": "",
+      "enabled": true,
+      "type": "secret"
+    },
+    {
+      "key": "TEST_PHONE_NUMBER",
+      "value": "",
+      "enabled": true,
+      "type": "secret"
+    }
+  ],
+  "_postman_variable_scope": "environment"
+}
