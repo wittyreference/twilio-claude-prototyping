@@ -158,6 +158,18 @@ This template is optimized for use with Claude Code. It includes:
 
 > **Step-by-step guide**: See [WALKTHROUGH.md](WALKTHROUGH.md) for a hands-on tutorial covering the full pipeline from idea to working application.
 
+### Two Development Workflows
+
+Choose based on your project needs:
+
+| Workflow | Best For | How It Works |
+|----------|----------|--------------|
+| **Document-Driven** | Complex projects, team collaboration, pause/resume | Use `.github/prompts/` templates to create artifacts |
+| **Subagent Pipeline** | Rapid prototyping, quick iterations | Use `/slash` commands for interactive development |
+| **Hybrid** (Recommended) | Production features | Documents for planning, subagents for execution |
+
+See [WALKTHROUGH.md Section 3](WALKTHROUGH.md#3-choosing-your-workflow) for detailed guidance on choosing your workflow.
+
 ### Custom Slash Commands
 
 **Workflow Orchestration**
@@ -236,14 +248,18 @@ The template includes skills for managing context in long development sessions:
 
 Use `/context summarize` to compress context during long sessions, or `/context load` to expand context for new tasks.
 
-### Agent-Assisted Pipeline
+### Agent-Assisted Pipeline (Document-Driven Workflow)
 
-Located in `.github/prompts/`:
+Located in `.github/prompts/`, these templates create persistent artifacts for complex projects:
 
-- `brainstorm.md` - Ideation template
-- `plan.md` - Implementation planning
-- `spec.md` - Feature specifications
-- `execute.md` - Execution guidelines
+| Template | Purpose | Creates |
+|----------|---------|---------|
+| `brainstorm.md` | Explore ideas, select Twilio APIs | Concept document |
+| `plan.md` | Structure implementation phases | `prompt_plan.md`, `todo.md` |
+| `spec.md` | Detail function specifications | Specification document |
+| `execute.md` | Guide TDD implementation | Code with task tracking |
+
+Use these when you need shareable documents, team review, or pause/resume capability.
 
 ## Testing
 

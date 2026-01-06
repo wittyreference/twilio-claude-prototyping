@@ -43,14 +43,15 @@ By the end of this walkthrough, you'll understand how to use this repository's A
 
 1. [Introduction and Prerequisites](#1-introduction-and-prerequisites)
 2. [Understanding the Pipeline](#2-understanding-the-pipeline)
-3. [Phase 1: Brainstorming Your Idea](#3-phase-1-brainstorming-your-idea)
-4. [Phase 2: Planning the Implementation](#4-phase-2-planning-the-implementation)
-5. [Phase 3: Test-Driven Development](#5-phase-3-test-driven-development)
-6. [Phase 4: Review and Quality Gates](#6-phase-4-review-and-quality-gates)
-7. [Hooks: Your Safety Net](#7-hooks-your-safety-net)
-8. [Running the Full Example](#8-running-the-full-example)
-9. [Advanced Topics](#9-advanced-topics)
-10. [Quick Reference](#10-quick-reference)
+3. [Choosing Your Workflow](#3-choosing-your-workflow)
+4. [Phase 1: Brainstorming Your Idea](#4-phase-1-brainstorming-your-idea)
+5. [Phase 2: Planning the Implementation](#5-phase-2-planning-the-implementation)
+6. [Phase 3: Test-Driven Development](#6-phase-3-test-driven-development)
+7. [Phase 4: Review and Quality Gates](#7-phase-4-review-and-quality-gates)
+8. [Hooks: Your Safety Net](#8-hooks-your-safety-net)
+9. [Running the Full Example](#9-running-the-full-example)
+10. [Advanced Topics](#10-advanced-topics)
+11. [Quick Reference](#11-quick-reference)
 - [Appendix A: Files Created](#appendix-a-files-created)
 - [Appendix B: Reference Links](#appendix-b-reference-links)
 
@@ -293,7 +294,254 @@ For common workflows, you can use `/orchestrate` to run the entire pipeline auto
 
 ---
 
-## 3. Phase 1: Brainstorming Your Idea
+## 3. Choosing Your Workflow
+
+This template supports two development workflows. Choose based on your project needs, or combine them for maximum flexibility.
+
+```
++=============================================================================+
+|                         TWO PATHS TO WORKING CODE                           |
++=============================================================================+
+
+    DOCUMENT-DRIVEN                           SUBAGENT PIPELINE
+    (Artifacts First)                         (Interactive)
+
+    +------------------+                      +------------------+
+    |   brainstorm.md  |                      |    /architect    |
+    |   (Explore)      |                      |    (Review)      |
+    +--------+---------+                      +--------+---------+
+             |                                         |
+             v                                         v
+    +------------------+                      +------------------+
+    |     plan.md      |                      |      /spec       |
+    |   (Structure)    |                      |    (Specify)     |
+    +--------+---------+                      +--------+---------+
+             |                                         |
+             v     Creates                             v
+    +------------------+                      +------------------+
+    |   prompt_plan.md |                      |    /test-gen     |
+    |   todo.md        |                      |    (Test)        |
+    +--------+---------+                      +--------+---------+
+             |                                         |
+             v                                         v
+    +------------------+                      +------------------+
+    |    execute.md    |                      |      /dev        |
+    |   (Implement)    |                      |    (Build)       |
+    +------------------+                      +--------+---------+
+                                                       |
+                                                       v
+                                              +------------------+
+                                              |  /review /test   |
+                                              |    (Validate)    |
+                                              +------------------+
+
+    OUTPUT: Files on disk                     OUTPUT: Working code
+    - prompt_plan.md                          - Real-time feedback
+    - todo.md                                 - Immediate execution
+    - spec.md
+```
+
+### Document-Driven Pipeline
+
+Uses prompt templates in `.github/prompts/` to create persistent artifacts that you can review, share, and resume later.
+
+**Files involved:**
+
+| File | Purpose | Creates |
+|------|---------|---------|
+| `brainstorm.md` | Explore ideas, select Twilio APIs | Concept document |
+| `plan.md` | Structure implementation phases | `prompt_plan.md`, `todo.md` |
+| `spec.md` | Detail function specifications | Specification document |
+| `execute.md` | Guide TDD implementation | Code with task tracking |
+
+**How to use:**
+
+```bash
+# Step 1: Brainstorm (add template to context)
+# In Claude Code, reference the file:
+"Using the template at .github/prompts/brainstorm.md, help me brainstorm
+a voice IVR for customer support"
+
+# Step 2: Plan (reference plan.md template)
+"Following .github/prompts/plan.md, create an implementation plan"
+# Creates: prompt_plan.md, todo.md
+
+# Step 3: Specify (reference spec.md template)
+"Using .github/prompts/spec.md as a template, write a specification
+for the IVR greeting handler"
+
+# Step 4: Execute (follow execute.md guidelines)
+"Following .github/prompts/execute.md, implement the first task in todo.md"
+```
+
+**Best for:** Complex multi-phase projects, team collaboration, pause/resume workflows
+
+### Subagent Pipeline
+
+Uses slash commands for real-time, interactive development with immediate feedback.
+
+**Commands involved:**
+
+| Command | Role | Output |
+|---------|------|--------|
+| `/architect` | Design review | Architecture recommendation |
+| `/spec` | Specification | Technical specification |
+| `/test-gen` | Test generation | Failing tests (TDD Red) |
+| `/dev` | Implementation | Passing tests (TDD Green) |
+| `/review` | Code review | Approval or change requests |
+| `/test` | Test validation | Test results |
+| `/docs` | Documentation | Updated docs |
+
+**How to use:**
+
+```bash
+/architect voice IVR for customer support
+/spec voice IVR with department routing
+/test-gen IVR greeting handler
+/dev IVR greeting handler
+/review
+/test
+/docs
+```
+
+**Best for:** Rapid prototyping, solo development, quick iterations
+
+### Comparison: Which Workflow?
+
+| Factor | Document-Driven | Subagent Pipeline |
+|--------|-----------------|-------------------|
+| **Speed** | Slower, deliberate | Fast, iterative |
+| **Artifacts** | Creates files on disk | In-memory context |
+| **Pause/Resume** | Easy - files persist | Harder - context may be lost |
+| **Team collaboration** | Better - shareable docs | Session-bound |
+| **Complexity handling** | Better for multi-phase | Better for single features |
+| **Traceability** | High - everything documented | Lower - ephemeral |
+
+### Decision Guide
+
+```
+                              START
+                                |
+                                v
+                  +---------------------------+
+                  | Is this a complex,        |
+                  | multi-phase project?      |
+                  +-------------+-------------+
+                                |
+               +----------------+----------------+
+               |                                 |
+              YES                               NO
+               |                                 |
+               v                                 v
+    +--------------------+            +--------------------+
+    | Will you pause and |            | Single feature or  |
+    | resume over days?  |            | quick prototype?   |
+    +----------+---------+            +----------+---------+
+               |                                 |
+      +--------+--------+               +--------+--------+
+      |                 |               |                 |
+     YES               NO              YES               NO
+      |                 |               |                 |
+      v                 v               v                 v
+  +---------+     +-----------+   +-----------+    +-----------+
+  | DOCUMENT|     |  HYBRID   |   | SUBAGENT  |    |  HYBRID   |
+  | DRIVEN  |     |  APPROACH |   | PIPELINE  |    | (if team) |
+  +---------+     +-----------+   +-----------+    +-----------+
+```
+
+### Hybrid Approach (Recommended)
+
+Combine both workflows for maximum flexibility: use documents for planning, then switch to subagents for execution.
+
+```
++=============================================================================+
+|                           HYBRID WORKFLOW                                   |
++=============================================================================+
+
+    PLANNING PHASE                         EXECUTION PHASE
+    (Document-Driven)                      (Subagent Pipeline)
+
+    +------------------+
+    |   brainstorm.md  |  Explore
+    |   "What to build"|  concept
+    +--------+---------+
+             |
+             v
+    +------------------+     +---------------+
+    |     plan.md      | --> | prompt_plan   |
+    |  "How to build"  |     | .md + todo.md |
+    +--------+---------+     +-------+-------+
+             |                       |
+             |    HANDOFF POINT      |
+             +-----------+-----------+
+                         |
+                         v
+               +------------------+
+               |   /architect     |
+               |   Review plan    |
+               +--------+---------+
+                        |
+                        v
+    +------------------+         +------------------+
+    |     spec.md      | ------> |      /spec       |
+    |   Fill template  |         |  Refine details  |
+    +------------------+         +--------+---------+
+                                          |
+                                          v
+                                +------------------+
+                                |    /test-gen     |
+                                +--------+---------+
+                                          |
+                                          v
+                                +------------------+
+                                |      /dev        |
+                                +--------+---------+
+                                          |
+                                          v
+                                +------------------+
+                                | /review --> /test|
+                                +------------------+
+```
+
+**How the hybrid approach works:**
+
+1. **Brainstorm with documents**: Reference `.github/prompts/brainstorm.md` to explore your concept
+2. **Plan with documents**: Use `plan.md` to create `prompt_plan.md` and `todo.md`
+3. **Architect reviews**: `/architect` validates the plan against existing patterns
+4. **Specify together**: Reference `spec.md` template, then refine with `/spec`
+5. **Execute with subagents**: `/test-gen` → `/dev` → `/review` → `/test` → `/docs`
+
+**Handoff commands:**
+
+```bash
+# After creating prompt_plan.md with plan.md template
+/architect review the implementation plan in prompt_plan.md
+
+# After creating specification with spec.md template
+/spec refine the specification based on spec.md
+
+# Then continue with subagent execution
+/test-gen [feature from spec]
+/dev [feature]
+/review
+/test
+/docs
+```
+
+### Quick Start by Scenario
+
+| Scenario | Recommended Workflow | First Step |
+|----------|---------------------|------------|
+| Complex multi-week project | Document-Driven | Reference `brainstorm.md` |
+| Team needs to review design | Document-Driven or Hybrid | Create `prompt_plan.md` |
+| Quick prototype (< 1 day) | Subagent Pipeline | `/orchestrate new-feature` |
+| Solo rapid iteration | Subagent Pipeline | `/architect [idea]` |
+| Resume after long break | Document-Driven | Check `todo.md` |
+| Production feature | Hybrid | Documents for plan, subagents for code |
+
+---
+
+## 4. Phase 1: Brainstorming Your Idea
 
 ### Starting Claude Code
 
@@ -304,7 +552,11 @@ cd twilio-claude-prototyping
 claude
 ```
 
-### Describing Your Idea
+### Two Approaches to Brainstorming
+
+Choose based on your needs (see Section 3 for details):
+
+#### Quick Approach (Subagent Pipeline)
 
 Simply describe what you want to build in natural language:
 
@@ -312,6 +564,17 @@ Simply describe what you want to build in natural language:
 > I want to build a phone application where callers can speak
 > and the app repeats what they said back to them
 ```
+
+#### Structured Approach (Document-Driven)
+
+For more complex projects, reference the brainstorm template:
+
+```
+> Using the template at .github/prompts/brainstorm.md, help me brainstorm
+> a phone application where callers can speak and the app repeats it back
+```
+
+This produces a more detailed concept document you can save and share.
 
 ### What Happens Behind the Scenes
 
@@ -357,13 +620,23 @@ A Twilio Voice application using two TwiML verbs:
 Ready for architecture review with /architect
 ```
 
+### Saving Your Concept (Document-Driven Workflow)
+
+If using the document-driven approach, save the concept output to a file for later reference:
+
+```
+> Please save this concept to docs/speech-parrot-concept.md
+```
+
+This creates an artifact you can review with teammates or resume later.
+
 ### Reference
 
-The brainstorming structure comes from `.github/prompts/brainstorm.md`. You don't need to read it, but it's there if you're curious about how the prompts are structured.
+The brainstorming structure comes from `.github/prompts/brainstorm.md`. For the document-driven workflow, you can reference this template directly to get more structured output.
 
 ---
 
-## 4. Phase 2: Planning the Implementation
+## 5. Phase 2: Planning the Implementation
 
 ### Invoking the Architect
 
@@ -478,7 +751,7 @@ The specification format comes from `.github/prompts/spec.md`. The spec becomes 
 
 ---
 
-## 5. Phase 3: Test-Driven Development
+## 6. Phase 3: Test-Driven Development
 
 ### The TDD Approach
 
@@ -661,7 +934,7 @@ Tests:       12 passed, 12 total
 
 ---
 
-## 6. Phase 4: Review and Quality Gates
+## 7. Phase 4: Review and Quality Gates
 
 ### Code Review
 
@@ -782,7 +1055,7 @@ This updates CLAUDE.md files and ensures all code has proper comments.
 
 ---
 
-## 7. Hooks: Your Safety Net
+## 8. Hooks: Your Safety Net
 
 ### What Hooks Do
 
@@ -856,7 +1129,7 @@ Hook configuration is in `.claude/settings.json`. Hook scripts are in `.claude/h
 
 ---
 
-## 8. Running the Full Example
+## 9. Running the Full Example
 
 Now let's put it all together. You have two options:
 
@@ -1010,7 +1283,7 @@ Your webhook URL: `https://speech-parrot-1234-dev.twil.io/voice/speech-parrot`
 
 ---
 
-## 9. Advanced Topics
+## 10. Advanced Topics
 
 ### Parallel Subagent Activities
 
@@ -1091,7 +1364,7 @@ SECURITY AUDIT:
 
 ---
 
-## 10. Quick Reference
+## 11. Quick Reference
 
 ### Command Cheat Sheet
 
