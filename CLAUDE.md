@@ -350,3 +350,15 @@ Required GitHub Secrets:
 - `TWILIO_PHONE_NUMBER`
 - `TWILIO_VERIFY_SERVICE_SID`
 - `TEST_PHONE_NUMBER`
+
+---
+
+## Attribution
+
+This CLAUDE.md structure and many of the interaction patterns were inspired by:
+
+- **Harper Reed's dotfiles**: [github.com/harperreed/dotfiles/.claude/CLAUDE.md](https://github.com/harperreed/dotfiles/blob/master/.claude/CLAUDE.md) - The foundational approach to Claude Code configuration, relationship framing, and coding principles.
+
+- **Agent Skills for Context Engineering**: [github.com/muratcankoylan/Agent-Skills-for-Context-Engineering](https://github.com/muratcankoylan/Agent-Skills-for-Context-Engineering) - Context engineering skills adapted for Twilio development workflows.
+
+Thank you to these developers for sharing their work openly.
