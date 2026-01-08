@@ -4,10 +4,10 @@ A GitHub template repository optimized for rapid Twilio CPaaS prototyping with C
 
 ## Features
 
-- **Twilio Serverless Functions** - Pre-configured for Voice, Messaging, Conversation Relay, and Verify
+- **Twilio Serverless Functions** - Pre-configured for Voice, Messaging, Conversation Relay, Verify, Sync, TaskRouter, and Messaging Services
 - **Test-Driven Development** - Jest for unit/integration tests, Newman for E2E
 - **CI/CD Pipeline** - GitHub Actions for testing and deployment
-- **Claude Code Optimized** - Custom slash commands, CLAUDE.md hierarchy, and specialized subagents
+- **Claude Code Optimized** - Custom slash commands, CLAUDE.md hierarchy, CLI reference, and specialized subagents
 
 ## Quick Start
 
@@ -75,6 +75,9 @@ A GitHub template repository optimized for rapid Twilio CPaaS prototyping with C
 │   ├── messaging/           # SMS/MMS handlers
 │   ├── conversation-relay/  # Real-time voice AI
 │   ├── verify/              # Phone verification
+│   ├── sync/                # Real-time state synchronization
+│   ├── taskrouter/          # Task routing to workers
+│   ├── messaging-services/  # Sender pools, compliance
 │   └── helpers/             # Shared private functions
 ├── __tests__/               # Test suites
 └── postman/                 # Newman E2E collections
@@ -149,6 +152,60 @@ exports.handler = async (context, event, callback) => {
     .services(context.TWILIO_VERIFY_SERVICE_SID)
     .verifications.create({ to: event.to, channel: 'sms' });
   return callback(null, { success: true, status: verification.status });
+};
+```
+
+### Sync
+
+Real-time state synchronization across devices:
+
+```javascript
+// functions/sync/store-state.protected.js
+exports.handler = async (context, event, callback) => {
+  const client = context.getTwilioClient();
+  const doc = await client.sync.v1
+    .services(context.TWILIO_SYNC_SERVICE_SID)
+    .documents.create({
+      uniqueName: `call-${event.CallSid}`,
+      data: { stage: 'greeting', selections: [] },
+      ttl: 3600
+    });
+  return callback(null, { success: true, sid: doc.sid });
+};
+```
+
+### TaskRouter
+
+Skills-based routing to workers and agents:
+
+```javascript
+// functions/taskrouter/create-task.protected.js
+exports.handler = async (context, event, callback) => {
+  const client = context.getTwilioClient();
+  const task = await client.taskrouter.v1
+    .workspaces(context.TWILIO_TASKROUTER_WORKSPACE_SID)
+    .tasks.create({
+      workflowSid: context.TWILIO_TASKROUTER_WORKFLOW_SID,
+      attributes: JSON.stringify({ type: 'support', language: 'english' })
+    });
+  return callback(null, { success: true, taskSid: task.sid });
+};
+```
+
+### Messaging Services
+
+Sender pools, geographic matching, and A2P compliance:
+
+```javascript
+// functions/messaging-services/send-campaign.protected.js
+exports.handler = async (context, event, callback) => {
+  const client = context.getTwilioClient();
+  const message = await client.messages.create({
+    to: event.to,
+    messagingServiceSid: context.TWILIO_MESSAGING_SERVICE_SID,
+    body: event.body
+  });
+  return callback(null, { success: true, sid: message.sid });
 };
 ```
 
@@ -233,7 +290,8 @@ This template includes automated hooks that run during Claude Code sessions:
 ### CLAUDE.md Hierarchy
 
 - Root `CLAUDE.md` contains project-wide standards
-- Subdirectory `CLAUDE.md` files provide API-specific context
+- Subdirectory `CLAUDE.md` files provide API-specific context (Voice, Messaging, Verify, Sync, TaskRouter, Messaging Services)
+- `.claude/references/twilio-cli.md` provides comprehensive CLI command reference to reduce token usage
 
 ### Context Engineering Skills
 
@@ -339,6 +397,7 @@ MIT
 
 - [WALKTHROUGH.md](WALKTHROUGH.md) - Comprehensive pipeline tutorial (start here!)
 - [.claude/workflows/README.md](.claude/workflows/README.md) - Detailed subagent workflow documentation
+- [.claude/references/twilio-cli.md](.claude/references/twilio-cli.md) - Twilio CLI command reference
 - [CLAUDE.md](CLAUDE.md) - Project standards and AI agent instructions
 
 ### External Documentation
