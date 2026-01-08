@@ -5,7 +5,6 @@ exports.handler = async (context, event, callback) => {
   const twiml = new Twilio.twiml.MessagingResponse();
 
   const incomingMessage = event.Body || '';
-  const fromNumber = event.From;
 
   const responseText = `Thanks for your message! You said: "${incomingMessage.substring(0, 100)}"`;
 
