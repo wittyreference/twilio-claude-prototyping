@@ -37,7 +37,7 @@
     "eslint": "^8.57.0",
     "jest": "^29.7.0",
     "newman": "^6.1.0",
-    "twilio-run": "^4.0.0"
+    "twilio-run": "^5.0.0"
   },
   "engines": {
     "node": ">=18.0.0"
