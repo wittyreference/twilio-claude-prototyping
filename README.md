@@ -15,7 +15,7 @@ A GitHub template repository optimized for rapid Twilio CPaaS prototyping with C
 
 ### Prerequisites
 
-- Node.js 18+ installed
+- Node.js 18-22 installed (Twilio Serverless does not support versions beyond 22)
 - Twilio account with Account SID and Auth Token
 - Twilio CLI installed (`npm install -g twilio-cli`)
 - Twilio Serverless plugin (`twilio plugins:install @twilio-labs/plugin-serverless`)

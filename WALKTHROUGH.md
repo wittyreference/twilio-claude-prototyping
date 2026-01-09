@@ -106,7 +106,7 @@ Before we start, let's define a few terms you'll encounter:
 
 Before starting, make sure you have:
 
-- [ ] **Node.js 18+** installed
+- [ ] **Node.js 18-22** installed (Twilio Serverless does not support versions beyond 22)
 - [ ] **Twilio CLI** installed (`npm install -g twilio-cli`)
 - [ ] **Twilio Serverless plugin** installed (`twilio plugins:install @twilio-labs/plugin-serverless`)
 - [ ] **Twilio account** with Account SID and Auth Token
@@ -130,9 +130,9 @@ You can use either or both. Most developers start with **local + ngrok** for fas
 Run these commands to verify everything is ready:
 
 ```bash
-# Check Node.js version (need 18+)
+# Check Node.js version (need 18-22)
 node --version
-# Expected: v18.x.x or higher
+# Expected: v18.x.x, v20.x.x, or v22.x.x
 
 # Check Twilio CLI
 twilio --version
