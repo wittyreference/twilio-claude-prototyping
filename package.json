@@ -34,7 +34,7 @@
   "devDependencies": {
     "@twilio-labs/serverless-runtime-types": "^4.0.0",
     "dotenv": "^17.2.3",
-    "eslint": "^8.57.0",
+    "eslint": "^9.39.2",
     "jest": "^29.7.0",
     "newman": "^6.1.0",
     "twilio-run": "^5.0.0"
